@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nightwings Member Directory</title>
+  <style>
+    :root {
+      --bg: #070a10;
+      --bg-soft: #0d111a;
+      --panel: rgba(13, 17, 26, 0.92);
+      --panel-strong: rgba(16, 22, 32, 0.98);
+      --border: rgba(57, 255, 20, 0.18);
+      --border-strong: rgba(57, 255, 20, 0.35);
+      --text: #f2f5f9;
+      --muted: #a6b2c8;
+      --green: #39ff14;
+      --cyan: #2eeefe;
+      --amber: #ffb627;
+      --purple: #b56cff;
+      --danger: #ff6d6d;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+      --radius-sm: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Inter, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(57, 255, 20, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(46, 238, 254, 0.08), transparent 30%),
+        linear-gradient(180deg, #05070b 0%, #090d13 32%, #05070b 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(57, 255, 20, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(180deg, rgba(255,255,255,0.35), transparent 88%);
+    }
+
+    .shell {
+      width: min(1380px, calc(100vw - 32px));
+      margin: 28px auto 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      background: linear-gradient(145deg, rgba(12, 16, 24, 0.95), rgba(9, 12, 19, 0.92));
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -45% auto;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(57, 255, 20, 0.16), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      padding: 28px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .brand {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .brand-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      border: 1px solid rgba(57, 255, 20, 0.45);
+      background: radial-gradient(circle at 35% 35%, rgba(57, 255, 20, 0.28), rgba(10, 16, 12, 0.7));
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      box-shadow: inset 0 0 30px rgba(57, 255, 20, 0.12);
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 12px rgba(57, 255, 20, 0.85);
+    }
+
+    h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 720px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .pill-row, .summary-grid, .tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pill, .tab {
+      border: 1px solid rgba(166, 178, 200, 0.14);
+      background: rgba(8, 12, 19, 0.78);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+      min-height: 42px;
+    }
+
+    .pill strong {
+      color: var(--green);
+      font-size: 14px;
+    }
+
+    .search-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(8, 12, 19, 0.88);
+      border: 1px solid rgba(57, 255, 20, 0.18);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.04);
+    }
+
+    .search-wrap svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      color: var(--green);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .search-wrap input::placeholder {
+      color: rgba(166, 178, 200, 0.72);
+    }
+
+    .tab-list {
+      padding: 6px;
+      background: rgba(8, 12, 19, 0.88);
+      border-radius: 18px;
+      border: 1px solid rgba(57, 255, 20, 0.16);
+      justify-content: flex-start;
+    }
+
+    .tab {
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+      user-select: none;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, rgba(57, 255, 20, 0.16), rgba(46, 238, 254, 0.1));
+      border-color: rgba(57, 255, 20, 0.35);
+      color: var(--green);
+      transform: translateY(-1px);
+    }
+
+    .main {
+      margin-top: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      background: var(--panel);
+      border: 1px solid rgba(57, 255, 20, 0.12);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      min-height: 110px;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+    }
+
+    .summary-card .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .summary-card .value {
+      font-size: 28px;
+      margin-top: 12px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .summary-card .meta {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(13, 17, 26, 0.92), rgba(9, 13, 20, 0.96));
+      border: 1px solid rgba(57, 255, 20, 0.12);
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    }
+
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .results-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 16px;
+    }
+
+    .member-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(16, 22, 32, 0.96), rgba(10, 14, 22, 0.96));
+      border: 1px solid rgba(166, 178, 200, 0.12);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.03), 0 18px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .member-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      height: 4px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      opacity: 0.95;
+    }
+
+    .member-card.past::before {
+      background: linear-gradient(90deg, var(--amber), var(--purple));
+    }
+
+    .member-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .member-name {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .member-subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(166, 178, 200, 0.14);
+      background: rgba(7, 10, 16, 0.74);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge.verified {
+      color: var(--green);
+      border-color: rgba(57, 255, 20, 0.22);
+    }
+
+    .points {
+      text-align: right;
+      min-width: 112px;
+    }
+
+    .points .value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .member-card.past .points .value {
+      color: var(--amber);
+    }
+
+    .points .label {
+      margin-top: 8px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .stats-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border-radius: 16px;
+      background: rgba(6, 9, 14, 0.72);
+      border: 1px solid rgba(166, 178, 200, 0.08);
+      padding: 12px 13px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat .value {
+      margin-top: 8px;
+      font-size: 17px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      min-height: 240px;
+      border-radius: 24px;
+      border: 1px dashed rgba(166, 178, 200, 0.18);
+      background: rgba(9, 12, 18, 0.72);
+      color: var(--muted);
+      text-align: center;
+      padding: 32px 20px;
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    @media (max-width: 860px) {
+      .search-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100vw - 20px, 100%); margin-top: 16px; }
+      .hero-inner, .panel { padding: 18px; }
+      .member-head { flex-direction: column; }
+      .points { text-align: left; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-top">
+          <div class="brand">
+            <div class="brand-mark">G</div>
+            <div>
+              <div class="eyebrow">Guild Manager Export</div>
+              <h1>Nightwings <span style="color: var(--green)">[ж]</span></h1>
+              <div class="subtitle">A self-contained member directory export showing current guild members, past members, stored points, live roster details, and historical departure records.</div>
+            </div>
+          </div>
+          <div class="pill-row">
+            <div class="pill"><span>Generated</span><strong id="generatedAtLabel"></strong></div>
+            <div class="pill"><span>Guild ID</span><strong>3675</strong></div>
+            <div class="pill"><span>Current Members</span><strong id="memberCountPill"></strong></div>
+            <div class="pill"><span>Past Members</span><strong id="pastCountPill"></strong></div>
+          </div>
+        </div>
+
+        <div class="search-shell">
+          <label class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.5-3.5"></path>
+            </svg>
+            <input id="searchInput" type="search" placeholder="Search by member name, player ID, Discord username, or role..." />
+          </label>
+          <div class="tab-list" role="tablist" aria-label="Directory tabs">
+            <button class="tab active" type="button" data-tab="members">Members</button>
+            <button class="tab" type="button" data-tab="pastMembers">Past Members</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="summary-grid" id="summaryGrid"></section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 id="panelTitle">Members</h2>
+            <p id="panelSubtitle">Current guild roster with stored points, level, and live activity data.</p>
+          </div>
+          <div class="results-meta" id="resultsMeta"></div>
+        </div>
+
+        <div id="cardGrid" class="grid"></div>
+        <div id="emptyState" class="empty" hidden>
+          <div>
+            <strong>No results found</strong>
+            <span>Try a different search term or switch tabs.</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script id="directory-data" type="application/json">{"generatedAt":1774840941053,"guild":{"id":3675,"name":"Nightwings","tag":"ж"},"members":[{"id":1297271,"name":"Sigrdrifa of Everwinter","position":"Co Leader","level":27103,"points":6626,"lastActivity":1774803420,"steps":305369,"npcKills":81276,"userKills":9,"discordId":"","discordUsername":"","verified":false},{"id":839138,"name":"Mizzrah","position":"Officer","level":6700,"points":3120,"lastActivity":1774802504,"steps":22276,"npcKills":12114,"userKills":0,"discordId":"716307935659163699","discordUsername":"karotmizzrah","verified":true},{"id":1143658,"name":"low tier warlord","position":"Co Leader","level":13000,"points":2058,"lastActivity":1774796789,"steps":98511,"npcKills":31889,"userKills":1180,"discordId":"","discordUsername":"","verified":false},{"id":853338,"name":"Master Raven","position":"Leader","level":108789,"points":1786,"lastActivity":1774804614,"steps":697189,"npcKills":236574,"userKills":4213,"discordId":"1148831690043695104","discordUsername":"masterrav","verified":true},{"id":1318551,"name":"Pillow Or Sofa","position":"Officer","level":24707,"points":1433,"lastActivity":1774805399,"steps":243346,"npcKills":50528,"userKills":45,"discordId":"","discordUsername":"","verified":false},{"id":1231021,"name":"Thoryen","position":"Officer","level":17499,"points":1307,"lastActivity":1774798243,"steps":45172,"npcKills":42876,"userKills":30,"discordId":"","discordUsername":"","verified":false},{"id":649987,"name":"Conciliator","position":"Member","level":22624,"points":1062,"lastActivity":1774786930,"steps":101672,"npcKills":25772,"userKills":215,"discordId":"601673708352045057","discordUsername":"da_conciliator","verified":true},{"id":1272663,"name":"MASTER","position":"Co Leader","level":18484,"points":873,"lastActivity":1767643175,"steps":134065,"npcKills":41079,"userKills":2,"discordId":"","discordUsername":"","verified":false},{"id":734341,"name":"Nila","position":"Member","level":8641,"points":608,"lastActivity":1774795771,"steps":22087,"npcKills":4515,"userKills":0,"discordId":"340667485881892877","discordUsername":"nilamarie","verified":true},{"id":478988,"name":"Mastabowski","position":"Member","level":22812,"points":585,"lastActivity":1774770610,"steps":185838,"npcKills":37531,"userKills":3834,"discordId":"583727080072544307","discordUsername":"mastabowski1401","verified":true},{"id":1321770,"name":"ShinKen","position":"Member","level":1,"points":424,"lastActivity":1773285775,"steps":122214,"npcKills":30134,"userKills":1,"discordId":"","discordUsername":"","verified":false},{"id":909949,"name":"V4NGUARD","position":"Member","level":20198,"points":390,"lastActivity":1774800142,"steps":87118,"npcKills":47696,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1096178,"name":"Zenryoku l Sekuat Tenaga","position":"Co Leader","level":1187,"points":364,"lastActivity":1774147199,"steps":91549,"npcKills":46616,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":846458,"name":"Arkael is bored","position":"Member","level":1524,"points":362,"lastActivity":1774786893,"steps":6185,"npcKills":4330,"userKills":70,"discordId":"456179515484405780","discordUsername":"a_tired_uncle","verified":true},{"id":525875,"name":"Masquerade","position":"Member","level":4928,"points":353,"lastActivity":1774524425,"steps":35648,"npcKills":12606,"userKills":117,"discordId":"707628456703164557","discordUsername":"astroluxs","verified":true},{"id":1312724,"name":"Aurteria","position":"Member","level":2547,"points":290,"lastActivity":1774051709,"steps":17186,"npcKills":5408,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1277618,"name":"Cyb3rr4t","position":"Officer","level":24057,"points":243,"lastActivity":1774780882,"steps":244905,"npcKills":36247,"userKills":4888,"discordId":"317542984901984257","discordUsername":"itslukewarm","verified":true},{"id":918910,"name":"Hypnos","position":"Officer","level":8345,"points":221,"lastActivity":1773438389,"steps":41120,"npcKills":22790,"userKills":2,"discordId":"272820419944513537","discordUsername":"hypnodystro","verified":true},{"id":1312097,"name":"PinyaGains","position":"Officer","level":17667,"points":182,"lastActivity":1774797911,"steps":135826,"npcKills":36068,"userKills":62,"discordId":"605791039130828821","discordUsername":"pinyagains","verified":true},{"id":1328881,"name":"LytheYVL","position":"Member","level":1842,"points":150,"lastActivity":1774802267,"steps":10647,"npcKills":5317,"userKills":120,"discordId":"","discordUsername":"","verified":false},{"id":1315553,"name":"Superhawk22","position":"Member","level":4246,"points":132,"lastActivity":1774802292,"steps":26055,"npcKills":10752,"userKills":0,"discordId":"1410122314540122274","discordUsername":"thesuperhawk","verified":true},{"id":1295117,"name":"Megatobas","position":"Officer","level":11185,"points":127,"lastActivity":1774787306,"steps":69188,"npcKills":19242,"userKills":193,"discordId":"","discordUsername":"","verified":false},{"id":1311033,"name":"Stephanos","position":"Member","level":1462,"points":91,"lastActivity":1774802312,"steps":13136,"npcKills":4197,"userKills":0,"discordId":"291053755858812929","discordUsername":"bootylover009","verified":true},{"id":1323826,"name":"WhimsicalMisdreavus","position":"Member","level":3225,"points":88,"lastActivity":1774764385,"steps":39468,"npcKills":6168,"userKills":518,"discordId":"","discordUsername":"","verified":false},{"id":1334559,"name":"Icetruckkiller","position":"Member","level":1328,"points":84,"lastActivity":1772734038,"steps":12131,"npcKills":4237,"userKills":0,"discordId":"685743949268254722","discordUsername":"the_chef.69","verified":true},{"id":1282446,"name":"Follower of Darkness","position":"Member","level":1210,"points":81,"lastActivity":1773778983,"steps":17768,"npcKills":2899,"userKills":83,"discordId":"","discordUsername":"","verified":false},{"id":1332286,"name":"Twiggy","position":"Member","level":2162,"points":71,"lastActivity":1774800142,"steps":13750,"npcKills":3460,"userKills":9,"discordId":"","discordUsername":"","verified":false},{"id":972588,"name":"Piganightis","position":"Member","level":700,"points":62,"lastActivity":1774728561,"steps":12144,"npcKills":2010,"userKills":32,"discordId":"1368463716147789907","discordUsername":"hakuto__kunai","verified":true},{"id":1309334,"name":"RAFFIS","position":"Officer","level":6224,"points":59,"lastActivity":1774804687,"steps":78415,"npcKills":13440,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1202817,"name":"Mato90","position":"Member","level":3450,"points":54,"lastActivity":1774805404,"steps":42276,"npcKills":7752,"userKills":888,"discordId":"","discordUsername":"","verified":false},{"id":1167446,"name":"Shiba","position":"Member","level":4652,"points":50,"lastActivity":1774451843,"steps":35059,"npcKills":7704,"userKills":132,"discordId":"","discordUsername":"","verified":false},{"id":212954,"name":"Lilbean01","position":"Member","level":1493,"points":30,"lastActivity":1774803137,"steps":9366,"npcKills":1813,"userKills":95,"discordId":"","discordUsername":"","verified":false},{"id":160531,"name":"Joshy","position":"Member","level":905,"points":30,"lastActivity":1774797043,"steps":14512,"npcKills":2161,"userKills":1,"discordId":"304218416535830529","discordUsername":"joshy9577","verified":true},{"id":1008590,"name":"Rayas Forta","position":"Member","level":311,"points":30,"lastActivity":1774456934,"steps":5367,"npcKills":754,"userKills":1,"discordId":"","discordUsername":"","verified":false},{"id":991436,"name":"Zek","position":"Member","level":752,"points":20,"lastActivity":1773945762,"steps":5962,"npcKills":1222,"userKills":10,"discordId":"714660632858853376","discordUsername":"the_soup89","verified":true},{"id":1333839,"name":"Phenile Mandrake","position":"Member","level":202,"points":20,"lastActivity":1773299364,"steps":2784,"npcKills":252,"userKills":3,"discordId":"","discordUsername":"","verified":false},{"id":1330660,"name":"Genuivanne","position":"Member","level":379,"points":14,"lastActivity":1774745371,"steps":5350,"npcKills":1215,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1327862,"name":"DR4KK3N","position":"Member","level":439,"points":10,"lastActivity":1774800494,"steps":6138,"npcKills":928,"userKills":15,"discordId":"","discordUsername":"","verified":false},{"id":1333369,"name":"Chikito","position":"Member","level":295,"points":10,"lastActivity":1774436801,"steps":2638,"npcKills":616,"userKills":3,"discordId":"","discordUsername":"","verified":false},{"id":967430,"name":"Phantom Thief Kaito","position":"Member","level":1239,"points":6,"lastActivity":1774790574,"steps":19861,"npcKills":2654,"userKills":1,"discordId":"","discordUsername":"","verified":false},{"id":896347,"name":"Nightcall","position":"Member","level":997,"points":6,"lastActivity":1774482494,"steps":9062,"npcKills":3214,"userKills":372,"discordId":"","discordUsername":"","verified":false},{"id":1340678,"name":"M4DDH4TT3R","position":"Member","level":368,"points":4,"lastActivity":1774742415,"steps":3772,"npcKills":872,"userKills":35,"discordId":"","discordUsername":"","verified":false},{"id":1315226,"name":"Pro Gamer FC","position":"Member","level":341,"points":3,"lastActivity":1774792092,"steps":4262,"npcKills":1030,"userKills":15,"discordId":"","discordUsername":"","verified":false},{"id":23092,"name":"SkilTac","position":"Member","level":7474,"points":1,"lastActivity":1774788786,"steps":53826,"npcKills":13537,"userKills":820,"discordId":"","discordUsername":"","verified":false},{"id":364989,"name":"Shi no dīrā","position":"Member","level":2161,"points":1,"lastActivity":1774804978,"steps":14814,"npcKills":4289,"userKills":13,"discordId":"","discordUsername":"","verified":false},{"id":1336931,"name":"Dedrasil","position":"Member","level":157,"points":1,"lastActivity":1773129047,"steps":2216,"npcKills":330,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1338733,"name":"IchigoXZ","position":"Member","level":63,"points":1,"lastActivity":1773245478,"steps":1335,"npcKills":148,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1207158,"name":"DRAGON","position":"Officer","level":11220,"points":0,"lastActivity":1768482153,"steps":106001,"npcKills":28908,"userKills":105,"discordId":"","discordUsername":"","verified":false},{"id":1115952,"name":"Mighty Mystic","position":"Member","level":8756,"points":0,"lastActivity":1774009400,"steps":131455,"npcKills":17026,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1308202,"name":"Liuxius","position":"Member","level":4993,"points":0,"lastActivity":1774734328,"steps":43059,"npcKills":8403,"userKills":417,"discordId":"","discordUsername":"","verified":false},{"id":1101621,"name":"DragoonN1t3","position":"Member","level":4653,"points":0,"lastActivity":1774611104,"steps":24429,"npcKills":3605,"userKills":259,"discordId":"","discordUsername":"","verified":false},{"id":365451,"name":"PapaBragi","position":"Member","level":4614,"points":0,"lastActivity":1774803596,"steps":42028,"npcKills":8249,"userKills":21,"discordId":"","discordUsername":"","verified":false},{"id":1268701,"name":"D U B S T E P","position":"Member","level":4139,"points":0,"lastActivity":1774516873,"steps":60227,"npcKills":10353,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1137624,"name":"XmanAngel","position":"Member","level":3286,"points":0,"lastActivity":1774767938,"steps":15602,"npcKills":2095,"userKills":5,"discordId":"","discordUsername":"","verified":false},{"id":27615,"name":"Weshaven","position":"Member","level":3179,"points":0,"lastActivity":1774758850,"steps":28788,"npcKills":7970,"userKills":4,"discordId":"","discordUsername":"","verified":false},{"id":1282517,"name":"eihgtt","position":"Member","level":2889,"points":0,"lastActivity":1774804182,"steps":58653,"npcKills":11818,"userKills":1913,"discordId":"","discordUsername":"","verified":false},{"id":1109332,"name":"Krizz Walpurgis","position":"Member","level":2466,"points":0,"lastActivity":1773213206,"steps":6214,"npcKills":4137,"userKills":1,"discordId":"","discordUsername":"","verified":false},{"id":1244206,"name":"JusT1en","position":"Member","level":1912,"points":0,"lastActivity":1773455196,"steps":21977,"npcKills":4031,"userKills":189,"discordId":"","discordUsername":"","verified":false},{"id":1294048,"name":"Bitten","position":"Officer","level":1391,"points":0,"lastActivity":1770790378,"steps":19007,"npcKills":3307,"userKills":44,"discordId":"","discordUsername":"","verified":false},{"id":1302944,"name":"Fearless","position":"Officer","level":1362,"points":0,"lastActivity":1770756138,"steps":17298,"npcKills":4563,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1315471,"name":"AskanM","position":"Member","level":1220,"points":0,"lastActivity":1774724775,"steps":6822,"npcKills":2835,"userKills":2,"discordId":"","discordUsername":"","verified":false},{"id":1321418,"name":"DolusRex","position":"Member","level":1129,"points":0,"lastActivity":1773635915,"steps":7507,"npcKills":3046,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1044792,"name":"Sir Manslaught","position":"Member","level":1060,"points":0,"lastActivity":1772890373,"steps":9279,"npcKills":2755,"userKills":285,"discordId":"","discordUsername":"","verified":false},{"id":930633,"name":"Ferber","position":"Member","level":1012,"points":0,"lastActivity":1774377115,"steps":16829,"npcKills":2333,"userKills":27,"discordId":"","discordUsername":"","verified":false},{"id":1231627,"name":"hauhia","position":"Member","level":800,"points":0,"lastActivity":1774268233,"steps":10858,"npcKills":2387,"userKills":8,"discordId":"","discordUsername":"","verified":false},{"id":101934,"name":"Jbrodack","position":"Member","level":705,"points":0,"lastActivity":1774640218,"steps":1677,"npcKills":1244,"userKills":71,"discordId":"","discordUsername":"","verified":false},{"id":1225525,"name":"Lowfxz","position":"Member","level":663,"points":0,"lastActivity":1774368903,"steps":10421,"npcKills":1133,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":815899,"name":"Kibday","position":"Member","level":585,"points":0,"lastActivity":1773595458,"steps":11523,"npcKills":1411,"userKills":25,"discordId":"","discordUsername":"","verified":false},{"id":1304764,"name":"KarpVT","position":"Member","level":561,"points":0,"lastActivity":1774072202,"steps":6928,"npcKills":1582,"userKills":26,"discordId":"","discordUsername":"","verified":false},{"id":1044603,"name":"AEsirR","position":"Member","level":475,"points":0,"lastActivity":1774528298,"steps":5293,"npcKills":1282,"userKills":295,"discordId":"","discordUsername":"","verified":false},{"id":1334595,"name":"Onochi","position":"Member","level":208,"points":0,"lastActivity":1772761024,"steps":1754,"npcKills":230,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1337605,"name":"Enorda","position":"Member","level":190,"points":0,"lastActivity":1774664975,"steps":2593,"npcKills":401,"userKills":45,"discordId":"","discordUsername":"","verified":false},{"id":712592,"name":"DrDeath","position":"Member","level":160,"points":0,"lastActivity":1774413458,"steps":2754,"npcKills":255,"userKills":0,"discordId":"","discordUsername":"","verified":false},{"id":1342731,"name":"Logopoho","position":"Member","level":145,"points":0,"lastActivity":1774805402,"steps":1519,"npcKills":288,"userKills":3,"discordId":"","discordUsername":"","verified":false},{"id":1333189,"name":"Ivanna","position":"Member","level":85,"points":0,"lastActivity":1774264631,"steps":1111,"npcKills":131,"userKills":1,"discordId":"","discordUsername":"","verified":false},{"id":1340613,"name":"El Loko","position":"Member","level":40,"points":0,"lastActivity":1773866962,"steps":706,"npcKills":67,"userKills":2,"discordId":"","discordUsername":"","verified":false},{"id":1337813,"name":"LavyUndine","position":"Member","level":30,"points":0,"lastActivity":1772688136,"steps":586,"npcKills":47,"userKills":10,"discordId":"","discordUsername":"","verified":false},{"id":1197145,"name":"Wynand67","position":"Member","level":28,"points":0,"lastActivity":1774785836,"steps":265,"npcKills":46,"userKills":33,"discordId":"","discordUsername":"","verified":false},{"id":560363,"name":"KingDasWinx BR","position":"Officer","level":1,"points":0,"lastActivity":1768702443,"steps":161890,"npcKills":68985,"userKills":3,"discordId":"","discordUsername":"","verified":false}],"pastMembers":[]}</script>
+  <script>
+    const directoryData = JSON.parse(document.getElementById('directory-data').textContent || '{}');
+    const state = { tab: 'members', query: '' };
+    const generatedAtLabel = document.getElementById('generatedAtLabel');
+    const memberCountPill = document.getElementById('memberCountPill');
+    const pastCountPill = document.getElementById('pastCountPill');
+    const searchInput = document.getElementById('searchInput');
+    const summaryGrid = document.getElementById('summaryGrid');
+    const panelTitle = document.getElementById('panelTitle');
+    const panelSubtitle = document.getElementById('panelSubtitle');
+    const resultsMeta = document.getElementById('resultsMeta');
+    const cardGrid = document.getElementById('cardGrid');
+    const emptyState = document.getElementById('emptyState');
+    const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat('en-US').format(Number.isFinite(value) ? value : 0);
+    }
+
+    function formatDate(value) {
+      if (!value) return 'N/A';
+      return new Date(value).toLocaleString();
+    }
+
+    function formatRelativeActivity(value) {
+      if (!value) return 'Unknown';
+      const nowSeconds = Date.now() / 1000;
+      const diff = Math.max(0, Math.floor(nowSeconds - Number(value)));
+      if (diff < 60) return 'Active just now';
+      if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
+      return Math.floor(diff / 86400) + ' day ago';
+    }
+
+    function matchesQuery(item, query) {
+      if (!query) return true;
+      const haystack = [
+        item.name,
+        item.position,
+        String(item.id || ''),
+        item.discordUsername || '',
+        item.discordId || '',
+      ].join(' ').toLowerCase();
+      return haystack.includes(query);
+    }
+
+    function makeSummaryCards() {
+      const activePoints = (directoryData.members || []).reduce((sum, entry) => sum + Number(entry.points || 0), 0);
+      const pastPoints = (directoryData.pastMembers || []).reduce((sum, entry) => sum + Number(entry.points || 0), 0);
+      const highestMember = [...(directoryData.members || [])].sort((a, b) => Number(b.points || 0) - Number(a.points || 0))[0];
+      const recentDeparture = [...(directoryData.pastMembers || [])]
+        .filter((entry) => Number(entry.leftAt || 0) > 0)
+        .sort((a, b) => Number(b.leftAt || 0) - Number(a.leftAt || 0))[0];
+
+      const cards = [
+        {
+          label: 'Active Members',
+          value: formatNumber((directoryData.members || []).length),
+          meta: formatNumber(activePoints) + ' total active points'
+        },
+        {
+          label: 'Past Members',
+          value: formatNumber((directoryData.pastMembers || []).length),
+          meta: formatNumber(pastPoints) + ' stored historical points'
+        },
+        {
+          label: 'Top Wallet',
+          value: highestMember ? formatNumber(Number(highestMember.points || 0)) : '0',
+          meta: highestMember ? highestMember.name : 'No active members'
+        },
+        {
+          label: 'Recent Departure',
+          value: recentDeparture ? recentDeparture.name : 'None',
+          meta: recentDeparture ? formatDate(recentDeparture.leftAt) : 'No departures recorded'
+        }
+      ];
+
+      summaryGrid.innerHTML = cards.map((card) => (
+        '<article class="summary-card">' +
+          '<div class="label">' + card.label + '</div>' +
+          '<div class="value">' + card.value + '</div>' +
+          '<div class="meta">' + card.meta + '</div>' +
+        '</article>'
+      )).join('');
+    }
+
+    function renderCard(item) {
+      if (state.tab === 'members') {
+        return (
+          '<article class="member-card">' +
+            '<div class="member-head">' +
+              '<div>' +
+                '<h3 class="member-name">' + item.name + '</h3>' +
+                '<div class="member-subtitle">' + item.position + ' · Player ID #' + item.id + '</div>' +
+                '<div class="badge-row">' +
+                  (item.verified ? '<span class="badge verified">Verified Discord</span>' : '<span class="badge">Unverified</span>') +
+                  '<span class="badge">Level ' + (item.level == null ? 'N/A' : formatNumber(Number(item.level || 0))) + '</span>' +
+                  '<span class="badge">Last Active ' + formatRelativeActivity(item.lastActivity) + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="points">' +
+                '<div class="value">' + formatNumber(Number(item.points || 0)) + '</div>' +
+                '<div class="label">Points</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="stats-grid">' +
+              '<div class="stat"><div class="label">Discord</div><div class="value">' + (item.discordUsername || item.discordId || 'Not linked') + '</div></div>' +
+              '<div class="stat"><div class="label">Position</div><div class="value">' + item.position + '</div></div>' +
+              '<div class="stat"><div class="label">Steps</div><div class="value">' + formatNumber(Number(item.steps || 0)) + '</div></div>' +
+              '<div class="stat"><div class="label">NPC Kills</div><div class="value">' + formatNumber(Number(item.npcKills || 0)) + '</div></div>' +
+              '<div class="stat"><div class="label">PvP Kills</div><div class="value">' + formatNumber(Number(item.userKills || 0)) + '</div></div>' +
+              '<div class="stat"><div class="label">Last Activity Timestamp</div><div class="value">' + (item.lastActivity ? formatDate(Number(item.lastActivity) * 1000) : 'N/A') + '</div></div>' +
+            '</div>' +
+          '</article>'
+        );
+      }
+
+      return (
+        '<article class="member-card past">' +
+          '<div class="member-head">' +
+            '<div>' +
+              '<h3 class="member-name">' + item.name + '</h3>' +
+              '<div class="member-subtitle">' + item.position + ' · Player ID #' + item.id + '</div>' +
+              '<div class="badge-row">' +
+                '<span class="badge">Archived Member</span>' +
+                '<span class="badge">Saved Points ' + formatNumber(Number(item.points || 0)) + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="points">' +
+              '<div class="value">' + formatNumber(Number(item.points || 0)) + '</div>' +
+              '<div class="label">Saved Points</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="stats-grid">' +
+            '<div class="stat"><div class="label">Discord</div><div class="value">' + (item.discordUsername || item.discordId || 'Not linked') + '</div></div>' +
+            '<div class="stat"><div class="label">Last Known Level</div><div class="value">' + (item.level == null ? 'N/A' : formatNumber(Number(item.level || 0))) + '</div></div>' +
+            '<div class="stat"><div class="label">Left Guild</div><div class="value">' + formatDate(item.leftAt) + '</div></div>' +
+            '<div class="stat"><div class="label">Last Seen In Guild</div><div class="value">' + formatDate(item.lastSeenInGuildAt) + '</div></div>' +
+            '<div class="stat"><div class="label">Role</div><div class="value">' + item.position + '</div></div>' +
+            '<div class="stat"><div class="label">Player ID</div><div class="value">#' + item.id + '</div></div>' +
+          '</div>' +
+        '</article>'
+      );
+    }
+
+    function render() {
+      const source = state.tab === 'members' ? (directoryData.members || []) : (directoryData.pastMembers || []);
+      const filtered = source.filter((item) => matchesQuery(item, state.query));
+
+      tabButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.tab === state.tab);
+      });
+
+      panelTitle.textContent = state.tab === 'members' ? 'Members' : 'Past Members';
+      panelSubtitle.textContent = state.tab === 'members'
+        ? 'Current guild roster with stored points, level, linked Discord account, and recent activity.'
+        : 'Archived members moved out of the active guild list, preserving their saved points and departure history.';
+
+      resultsMeta.textContent = filtered.length + ' of ' + source.length + ' shown';
+      cardGrid.innerHTML = filtered.map(renderCard).join('');
+      emptyState.hidden = filtered.length > 0;
+      cardGrid.hidden = filtered.length === 0;
+    }
+
+    generatedAtLabel.textContent = new Date(Number(directoryData.generatedAt || Date.now())).toLocaleString();
+    memberCountPill.textContent = formatNumber((directoryData.members || []).length);
+    pastCountPill.textContent = formatNumber((directoryData.pastMembers || []).length);
+    makeSummaryCards();
+
+    searchInput.addEventListener('input', (event) => {
+      state.query = String(event.target.value || '').trim().toLowerCase();
+      render();
+    });
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        state.tab = button.dataset.tab || 'members';
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
